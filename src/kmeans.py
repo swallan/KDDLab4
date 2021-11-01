@@ -6,7 +6,7 @@ def main(args):
     filename = args[1]
     k = int(args[2])
     D = parseFile(filename)
-    alpha = 0.02
+    alpha = 0.0003
     clusters, centroids = kMeans(D, k, alpha)
     printClusters(clusters, centroids)
 
@@ -22,7 +22,7 @@ def kMeans(D, k, alpha):
             num[j] = 0
             clusters[j] = []
 
-        for d in D.itertuples(index=False):
+        for d in D.itertuples(index=False, name=None):
             cl_dist = [(i, euclideanDistance(d, centroids[i])) for i in range(k)]
             cl = min(cl_dist, key=lambda t: t[1])[0]
             clusters[cl].append(d)
@@ -48,10 +48,10 @@ def sumSquaredError(clusters, centroids1, centroids2):
     SSE1 = 0
     SSE2 = 0
     for j in range(len(clusters)):
-        sumCluster1 = sum([euclideanDistance(clusters[j][i], centroids1[j]) for i in range(len(clusters[j]))])
+        sumCluster1 = sum([(euclideanDistance(clusters[j][i], centroids1[j]))**2 for i in range(len(clusters[j]))])
         SSE1 += sumCluster1
 
-        sumCluster2 = sum([euclideanDistance(clusters[j][i], centroids2[j]) for i in range(len(clusters[j]))])
+        sumCluster2 = sum([(euclideanDistance(clusters[j][i], centroids2[j]))**2 for i in range(len(clusters[j]))])
         SSE2 += sumCluster2
 
     return abs(SSE1 - SSE2)
@@ -67,11 +67,28 @@ def centroidRecomputation(s, num, k):
     newCentroids = [[s[j][i] / num[j] for i in range(len(s[j]))] for j in range(k)]
     return newCentroids
 
+def sumSquaredClusterError(cluster, centroid):
+    SSE = sum([(euclideanDistance(j, centroid))**2 for j in cluster])
+    return SSE
+
 def printClusters(clusters, centroids):
     for j in clusters:
+        center = tuple(centroids[j])
+        SSE = sumSquaredClusterError(clusters[j], center)
         print("Number of points in cluster %d: %d" % (j, len(clusters[j])))
-        print("Coordinates of centroid %d: %s" % (j, str(centroids[j])))
-        print("Points: ", clusters[j])
+        print("Center %d: %s" % (j, str(center)))
+        dists = [euclideanDistance(i, center) for i in clusters[j]]
+        maxDist = max(dists)
+        minDist = min(dists)
+        avgDist = sum(dists) / len(dists)
+        print("Max Dist. to Center: ", maxDist)
+        print("Min Dist. to Center: ", minDist)
+        print("Avg Dist. to Center: ", avgDist)
+        print("SSE: ", SSE)
+        print("Points: ")
+        for i in clusters[j]:
+            print(i)
+        print("----------------------------------------")
 
 def parseFile(filename):
     df = pd.read_csv(filename, header=None)
