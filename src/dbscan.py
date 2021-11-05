@@ -224,6 +224,7 @@ dbscan for {sys.argv[1]} with:
 
 
     OUT = OUT.replace("\\n", "")
+    print(OUT)
     with open(f"out/dbscan_{fn}.out", 'w') as f:
         f.write(OUT)
-    print(OUT)
+

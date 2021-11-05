@@ -1,6 +1,7 @@
 import itertools
 from tabulate import tabulate
 import numpy as np
+import scipy.stats as stats
 
 p1, p2, height = 0, 1, 2
 
@@ -259,6 +260,8 @@ if __name__ == '__main__':
             means.append(round(np.mean(distances), ndigits=2))
             sse.append(np.sum(np.sum(np.abs(datas - center) ** 2, axis=1)))
 
+            mode = stats.mode(cluster.dataWithClass[list(pts)][..., -1])[0][0]
+            OUT += f"\nMost common classifier: {mode[:-2]}: this cluster is {len(np.where(cluster.dataWithClass[list(pts)][..., -1] == mode)[0]) / len((cluster.dataWithClass[list(pts)][..., -1])) * 100:.02f}% {mode[:-2]}"
 
             if cluster.non_normalized.shape[1] == 2:
                 nonNonrmal_data = cluster.non_normalized[list(pts)]
@@ -278,9 +281,10 @@ if __name__ == '__main__':
         OUT += '\n'
         OUT += tabulate([enumerates, centers, mind, maxd, means, sse], tablefmt="fancy_grid")
     OUT = OUT.replace("\\n", "")
+    print(OUT)
     with open(f"out/hclust_{sys.argv[1].split('/')[-1]}.out", 'w') as f:
         f.write(OUT)
-    print(OUT)
+
 
 
 
