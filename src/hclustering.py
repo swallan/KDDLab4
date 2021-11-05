@@ -236,7 +236,7 @@ if __name__ == '__main__':
         mind = ["min dist"]
         maxd = ["max dist"]
         means = ["mean dist"]
-        sse = ['mean square error']
+        sse = ['SSE']
 
         # for accidents 3d
         if cluster.non_normalized.shape[1] == 3:
@@ -257,7 +257,7 @@ if __name__ == '__main__':
             mind.append(round(np.min(distances), ndigits=2))
             maxd.append(round(np.max(distances), ndigits=2))
             means.append(round(np.mean(distances), ndigits=2))
-            sse.append(np.mean(np.sum(np.abs(datas - center) ** 2, axis=1) ** .5))
+            sse.append(np.sum(np.sum(np.abs(datas - center) ** 2, axis=1)))
 
 
             if cluster.non_normalized.shape[1] == 2:

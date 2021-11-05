@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 from tabulate import tabulate
+import scipy.stats as stats
 
 from hclustering import Point
 import numpy as np
@@ -143,7 +144,7 @@ dbscan for {sys.argv[1]} with:
     mind = ["min dist"]
     maxd = ["max dist"]
     means = ["mean dist"]
-    sse = ['mean square error']
+    sse = ['SSE']
 
     for i, c in enumerate(clusters):
         OUT += f'\nCluster {i}:\n'
@@ -156,8 +157,10 @@ dbscan for {sys.argv[1]} with:
         mind.append(round(np.min(distances), ndigits=2))
         maxd.append(round(np.max(distances), ndigits=2))
         means.append(round(np.mean(distances), ndigits=2))
-        sse.append(np.mean(np.sum(np.abs(data - center) ** 2, axis=1) ** .5))
+        sse.append(np.sum(np.sum(np.abs(data - center) ** 2, axis=1)))
 
+        mode = stats.mode(dbscan.dataWithClass[list(c)][..., -1])[0][0]
+        OUT += f"\nMost common classifier: {mode[:-2]}: this cluster is {len(np.where(dbscan.dataWithClass[list(c)][...,-1] == mode)[0]) / len((dbscan.dataWithClass[list(c)][...,-1]))*100:.02f}% {mode[:-2]}"
         for ci in c:
             all_categorized.add(ci)
     OUT += '\n'
@@ -166,8 +169,8 @@ dbscan for {sys.argv[1]} with:
 
     uncategorized_points = all_points - all_categorized
     OUT += f"\n{len(uncategorized_points)} datapoints were found to be noise out of {len(all_points)}"
-    if dbscan.rawData.shape[1] <=3:
-        if dbscan.non_normalized.shape[1] == 3:
+    if True:#dbscan.rawData.shape[1] <=3:
+        if dbscan.non_normalized.shape[1] >= 3:
             ax = plt.axes(projection='3d')
 
         #%%
@@ -213,10 +216,11 @@ dbscan for {sys.argv[1]} with:
 
 
 
-        if dbscan.non_normalized.shape[1] <= 3:
+        if True:#dbscan.non_normalized.shape[1] <= 3:
             plt.title(f"{sys.argv[1].split('/')[-1]} dbscan minPts={sys.argv[2]} epsilon={sys.argv[3]}")
             plt.savefig(f"out/dbscan_{fn}.jpg")
             plt.show()
+
 
 
     OUT = OUT.replace("\\n", "")
