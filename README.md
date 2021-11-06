@@ -1,3 +1,7 @@
+# Authors
+- Sam Wallan (swallan@calpoly.edu)
+- Ruhi Prasad (ruprasad@calpoly.edu)
+
 # How to run
 
 ### dbscan.py
