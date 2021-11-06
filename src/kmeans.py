@@ -83,7 +83,11 @@ def centroidRecomputation(s, num, k):
 
 def sumSquaredClusterError(cluster, centroid):
     SSE = sum([(euclideanDistance(j, centroid))**2 for j in cluster])
-    return SSE
+    if len(cluster) != 0:
+        SSEavg = round(SSE / len(cluster), 3)
+    else:
+        SSEavg = 0.0
+    return SSE, SSEavg
 
 def validateClusters(rowObjs):
     # calculates purity of each cluster
@@ -98,13 +102,15 @@ def printClusters(clusters, centroids, rowObjs):
     maxDists = ["max dist"]
     minDists = ["min dist"]
     avgDists = ["avg dist"]
-    SSEs = ["sse"]
+    SSEs = ["SSE"]
+    SSEavgs = ["avg SSE"]
     for j in clusters:
         clusterNums.append(j)
         center = tuple(centroids[j])
         centers.append(tuple(map(lambda x: round(x, 3), center)))
-        SSE = sumSquaredClusterError(clusters[j], center)
+        SSE, SSEavg = sumSquaredClusterError(clusters[j], center)
         SSEs.append(SSE)
+        SSEavgs.append(SSEavg)
         print("Number of points in cluster %d: %d" % (j, len(clusters[j])))
         print("Center %d: %s" % (j, str(center)))
         dists = [euclideanDistance(i, center) for i in clusters[j]]
@@ -121,13 +127,14 @@ def printClusters(clusters, centroids, rowObjs):
         print("Min Dist. to Center: ", minDist)
         print("Avg Dist. to Center: ", avgDist)
         print("SSE: ", SSE)
+        print("SSE per points in cluster: ", SSEavg)
         print("Points: ")
         for i in range(len(clusters[j])):
             if rowObjs:
                 print(rowObjs[j][i], end=" ")
             print(clusters[j][i])
         print("----------------------------------------")
-    data = [clusterNums, centers, minDists, maxDists, avgDists, SSEs]
+    data = [clusterNums, centers, minDists, maxDists, avgDists, SSEs, SSEavgs]
     print(
         tabulate(
             data,
